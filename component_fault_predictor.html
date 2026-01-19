@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Component Failure Predictor</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:"Poppins",sans-serif;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+}
+
+.container{
+    max-width:900px;
+    margin:50px auto;
+    padding:30px;
+}
+
+/* PAGE BASE */
+.page{
+    display:none;
+    opacity:0;
+    transform:translateX(40px);
+}
+
+.page.active{
+    display:block;
+    animation: slideIn 0.6s ease forwards;
+}
+
+@keyframes slideIn{
+    from{
+        opacity:0;
+        transform:translateX(40px);
+    }
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+.card{
+    background:white;
+    padding:40px;
+    border-radius:22px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.35);
+    position:relative;
+}
+
+.card::before{
+    content:"";
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:6px;
+    background:linear-gradient(90deg,#00c6ff,#0072ff);
+}
+
+h1{
+    text-align:center;
+    font-family:"Orbitron",sans-serif;
+}
+
+.sub{
+    text-align:center;
+    color:#666;
+    margin-bottom:25px;
+}
+
+label{
+    font-weight:600;
+    margin-top:18px;
+    display:block;
+}
+
+input,select{
+    width:100%;
+    padding:14px;
+    margin-top:8px;
+    font-size:16px;
+    border-radius:10px;
+    border:1px solid #bbb;
+}
+
+button{
+    margin-top:30px;
+    padding:14px 34px;
+    font-size:17px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#0072ff,#00c6ff);
+    color:white;
+    cursor:pointer;
+}
+
+.result{
+    padding:25px;
+    border-radius:14px;
+    font-size:18px;
+    line-height:1.7;
+    margin-top:25px;
+}
+
+.low{background:#d4edda;color:#155724;border-left:6px solid #28a745;}
+.medium{background:#fff3cd;color:#856404;border-left:6px solid #ffc107;}
+.high{background:#f8d7da;color:#721c24;border-left:6px solid #dc3545;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- PAGE 1 -->
+<div class="page active" id="p1">
+<div class="card">
+<h1>AI Component Failure Predictor</h1>
+<p class="sub">Smart Electronics Health Monitoring System</p>
+
+<label>Enter Component Name</label>
+<input type="text" id="component" placeholder="Eg: Capacitor, MOSFET, IC">
+
+<center><button onclick="next1()">Next</button></center>
+</div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="p2">
+<div class="card">
+<h1>Operating Conditions</h1>
+<p class="sub">Provide real-time working parameters</p>
+
+<label>Operating Hours</label>
+<input id="hours" type="number">
+
+<label>Temperature (°C)</label>
+<input id="temp" type="number">
+
+<label>Voltage Level</label>
+<select id="voltage">
+<option value="">-- Select --</option>
+<option>Normal</option>
+<option>High</option>
+</select>
+
+<center><button onclick="analyze()">Analyze Component</button></center>
+</div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="p3">
+<div class="card">
+<h1>AI Diagnostic Report</h1>
+<p class="sub">Intelligent risk & maintenance suggestion</p>
+<div id="output"></div>
+<center><button onclick="restart()">Analyze Another</button></center>
+</div>
+</div>
+
+</div>
+
+<script>
+let comp="";
+
+function showPage(from,to){
+    from.classList.remove("active");
+    setTimeout(()=>{
+        to.classList.add("active");
+    },100);
+}
+
+function next1(){
+    if(component.value.trim()==""){
+        alert("⚠️ Please enter component name!");
+        return;
+    }
+    comp = component.value;
+    showPage(p1,p2);
+}
+
+function analyze(){
+    if(hours.value=="" || temp.value=="" || voltage.value==""){
+        alert("⚠️ Please fill all fields!");
+        return;
+    }
+
+    let h = parseFloat(hours.value);
+    let t = parseFloat(temp.value);
+    let v = voltage.value;
+    let score=0;
+
+    if(t>50) score+=2;
+    if(t>70) score+=3;
+    if(v=="High") score+=3;
+    if(h>500) score+=2;
+    if(h>1000) score+=3;
+
+    let risk,cls,msg;
+
+    if(score>=7){
+        risk="HIGH RISK ❌";
+        cls="high";
+        msg="Immediate maintenance required. Reduce voltage and improve cooling.";
+    }else if(score>=4){
+        risk="MEDIUM RISK ⚠️";
+        cls="medium";
+        msg="Schedule inspection and monitor operating conditions.";
+    }else{
+        risk="LOW RISK ✅";
+        cls="low";
+        msg="Component operating safely. Continue monitoring.";
+    }
+
+    output.innerHTML=`
+    <div class="result ${cls}">
+    <b>Component:</b> ${comp}<br>
+    <b>Hours:</b> ${h}<br>
+    <b>Temperature:</b> ${t}°C<br>
+    <b>Voltage:</b> ${v}<br><br>
+    <b>Risk:</b> ${risk}<br><br>
+    <b>Recommendation:</b> ${msg}
+    </div>`;
+
+    showPage(p2,p3);
+}
+
+function restart(){
+    component.value="";
+    hours.value="";
+    temp.value="";
+    voltage.value="";
+    showPage(p3,p1);
+}
+</script>
+
+</body>
+</html>
